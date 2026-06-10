@@ -28,7 +28,7 @@ export interface GenerateDiagramFailure {
 
 export type GenerateDiagramResponse = GenerateDiagramResult | GenerateDiagramFailure;
 
-const THEME_INIT = `%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#1B3A5C', 'primaryTextColor': '#fff', 'primaryBorderColor': '#0F2440', 'lineColor': '#4A6FA5', 'secondaryColor': '#E8EDF3', 'tertiaryColor': '#F5F7FA', 'fontSize': '14px', 'clusterBkg': '#F5F7FA', 'clusterBorder': '#D0D8E3', 'edgeLabelBackground': '#fff'}}}%%`;
+const THEME_INIT = `%%{init: {'theme': 'base', 'flowchart': {'curve': 'linear'}, 'themeVariables': {'primaryColor': '#1B3A5C', 'primaryTextColor': '#fff', 'primaryBorderColor': '#0F2440', 'lineColor': '#4A6FA5', 'secondaryColor': '#E8EDF3', 'tertiaryColor': '#F5F7FA', 'fontSize': '14px', 'clusterBkg': '#F5F7FA', 'clusterBorder': '#D0D8E3', 'edgeLabelBackground': '#fff'}}}%%`;
 
 const DDLOG = 'D:/00_Huawei/Documents/02_learn/My_AI_Projects/vscode_workspace/wombat-blackboard/logs/debug.log';
 function ddlog(msg: string) { try { require('fs').appendFileSync(DDLOG, new Date().toISOString() + ' ' + msg + '\n'); } catch {} }
