@@ -122,8 +122,13 @@ export async function startFeishuChannel(): Promise<void> {
 
 async function renderPreviewImage(mermaidCode: string, rawClient: any): Promise<string | undefined> {
   try {
-    // 去掉 %%{init} 块以缩短 URL，用 ?theme=base 替代
-    const cleanCode = mermaidCode.replace(/^%%\{init:[\s\S]*?\}%%\s*/m, '');
+    // 去掉 %%{init} 块和 classDef 行以缩短 URL
+    let cleanCode = mermaidCode.replace(/^%%\{init:[\s\S]*?\}%%\s*/m, '');
+    const classDefs = cleanCode.match(/^classDef\s+\w+[\s\S]*?(?=\n\S|\n*$)/gm) || [];
+    cleanCode = cleanCode.replace(/^classDef\s+\w+[\s\S]*?(?=\n\S|\n*$)/gm, '');
+    // 去掉 class 应用行（如 class A,B sensor），因为 classDef 已被移除
+    cleanCode = cleanCode.replace(/^\s*class\s+[\w,]+(?:\s+\w+)?\s*$/gm, '');
+
     const encoded = Buffer.from(cleanCode, 'utf-8').toString('base64')
       .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     const inkUrl = `https://mermaid.ink/img/${encoded}?theme=base&scale=2`;
@@ -131,7 +136,20 @@ async function renderPreviewImage(mermaidCode: string, rawClient: any): Promise<
 
     const resp = await fetch(inkUrl);
     dlog('[preview] status=' + resp.status);
-    if (!resp.ok) return undefined;
+    if (!resp.ok) {
+      // 重试：进一步精简（去掉多余空白）
+      const compact = cleanCode.replace(/\n{2,}/g, '\n').trim();
+      const enc2 = Buffer.from(compact, 'utf-8').toString('base64')
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      const url2 = `https://mermaid.ink/img/${enc2}?theme=base&scale=2`;
+      dlog('[preview] retry urlLen=' + url2.length);
+      const resp2 = await fetch(url2);
+      dlog('[preview] retry status=' + resp2.status);
+      if (!resp2.ok) return undefined;
+      const buf2 = Buffer.from(await resp2.arrayBuffer());
+      const up2 = await rawClient.im.v1.image.create({ data: { image_type: 'message', image: buf2 } });
+      return (up2 as any)?.image_key as string | undefined;
+    }
 
     const imageBuffer = Buffer.from(await resp.arrayBuffer());
     dlog('[preview] downloaded ' + imageBuffer.length + ' bytes');
