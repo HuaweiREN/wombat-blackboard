@@ -1,0 +1,42 @@
+[
+  {
+    "id": "sensor-arch",
+    "name": "传感器架构",
+    "description": "L2+ 智驾传感器拓扑架构，包含摄像头、雷达、激光雷达等传感器类型与数据链路",
+    "category": "系统架构",
+    "diagramType": "flowchart",
+    "file": "sensor-arch.md"
+  },
+  {
+    "id": "domain-controller",
+    "name": "域控架构",
+    "description": "智驾域控制器内部分层设计，芯片选型与功能分配",
+    "category": "系统架构",
+    "diagramType": "flowchart",
+    "file": "domain-controller.md"
+  },
+  {
+    "id": "state-machine",
+    "name": "功能状态机",
+    "description": "ADAS/AD 功能状态流转，含激活、待机、故障、超控等典型状态",
+    "category": "功能设计",
+    "diagramType": "state",
+    "file": "state-machine.md"
+  },
+  {
+    "id": "odd-decision-tree",
+    "name": "ODD 决策树",
+    "description": "功能可用性判断流程，基于天气、光照、车道线、速度等条件",
+    "category": "功能设计",
+    "diagramType": "flowchart",
+    "file": "odd-decision-tree.md"
+  },
+  {
+    "id": "comm-topology",
+    "name": "通信拓扑",
+    "description": "整车 CAN/ETH/LIN 总线网络拓扑，含各域控制器节点",
+    "category": "系统架构",
+    "diagramType": "flowchart",
+    "file": "comm-topology.md"
+  }
+]

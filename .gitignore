@@ -1,0 +1,22 @@
+node_modules
+dist
+.env
+*.log
+.DS_Store
+
+# Portable build artifacts (large binaries)
+portable/wombat-blackboard.exe
+portable/client/dist/
+
+# Build outputs
+sea-prep.blob
+server/src/embedded-assets.ts
+*.exe
+sea-prep.blob
+*.zip
+.env
+node_modules/
+dist/
+logs/
+*.exe
+sea-prep.blob

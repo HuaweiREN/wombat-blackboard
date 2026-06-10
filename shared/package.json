@@ -1,0 +1,13 @@
+{
+  "name": "wombat-blackboard-shared",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./types.ts",
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "build": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
