@@ -93,7 +93,7 @@ export async function startFeishuChannel(): Promise<void> {
 
     const summary = `${previousMessages.length > 0 ? '已基于上一轮上下文优化。' : '已创建新的图表。'}\n${cleaned.slice(0, 160)}`;
     const card = buildResultCard({
-      title: 'Wombat 已生成示意图',
+      title: '已生成示意图',
       summary,
       code: result.mermaidCode,
       imageKey,
@@ -155,7 +155,7 @@ function buildThinkingCard(): object {
     config: { wide_screen_mode: true },
     header: {
       template: 'blue',
-      title: { tag: 'plain_text', content: 'Wombat thinking...' },
+      title: { tag: 'plain_text', content: '鲛人书 Arielgram' },
     },
     elements: [
       { tag: 'div', text: { tag: 'lark_md', content: '🤔 已收到你的描述，正在生成 Mermaid 图表...' } },
