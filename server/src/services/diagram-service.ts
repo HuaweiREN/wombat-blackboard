@@ -113,35 +113,42 @@ function validateGenerateInput(messages: ConversationMessage[]): { valid: boolea
 
 export function extractMermaidCode(response: string): string {
   const match = response.match(/```mermaid\n([\s\S]*?)\n```/);
-  if (match) return stripBareText(match[1].trim());
+  if (match) return cleanMermaid(match[1].trim());
 
   const altMatch = response.match(/```\n([\s\S]*?)\n```/);
-  if (altMatch) return stripBareText(altMatch[1].trim());
+  if (altMatch) return cleanMermaid(altMatch[1].trim());
 
-  return stripBareText(response.replace(/^(mermaid\s*)?/, '').trim());
+  return cleanMermaid(response.replace(/^(mermaid\s*)?/, '').trim());
 }
 
-// 去掉 Mermaid 代码块内的裸文本行（不匹配任何 Mermaid 语句的纯文字行）
+function cleanMermaid(code: string): string {
+  return stripBareText(code.replace(/<br\s*\/?>/gi, ' '));
+}
+
+// 去掉 Mermaid 代码块内的裸文本行（保留 Note 块内的续行）
 function stripBareText(code: string): string {
   const lines = code.split('\n');
-  // 如果某行包含这些 Mermaid 特征之一，就是合法行
+  let inNote = false;
+
   const isMermaidLine = (line: string): boolean => {
-    // 箭头语法
-    if (/-->|->>|-->>|->|-[x.]>|==>|--->/.test(line)) return true;
-    // 括号（节点/状态/参与者）
-    if (/[\[\(\{].*?[\]\)\}]/.test(line)) return true;
-    // 冒号（标签/转换说明）
-    if (/:/.test(line)) return true;
-    // 管道符（连线标签）
-    if (/\|/.test(line)) return true;
+    const t = line.trim();
+    if (!t || t.startsWith('%%')) { inNote = false; return true; }
+    // Note 块的续行（Note 可以跨多行，直到下一个 Mermaid 关键字）
+    if (inNote) {
+      if (/^(participant|actor|Note|rect\s|end\s*$|activate|deactivate|autonumber|loop\s|alt\s|else\s*$|opt\s|par\s|and\s|critical|break|group|sequenceDiagram|flowchart|stateDiagram|classDiagram|erDiagram|%%|\s*\[\*\])/i.test(t)) { inNote = false; }
+      else return true; // Note 续行
+    }
     // Mermaid 关键字开头
-    if (/^(participant|actor|Note|rect |end$|activate|deactivate|autonumber|loop |alt |else$|opt |par |and |critical|break|group|sequenceDiagram|flowchart|stateDiagram|classDiagram|erDiagram|gantt|pie|mindmap|timeline|subgraph|style|classDef|class |title |state |%%)/i.test(line.trim())) return true;
-    // 状态图 state 声明或 [*]
-    if (/^\s*(state\s|\[\*\])/i.test(line)) return true;
-    // class 应用（如 "class A,B sensor"）
-    if (/^\s*class\s+[\w,]+/.test(line)) return true;
-    // 纯空白或注释
-    if (/^\s*$|^\s*%%/.test(line)) return true;
+    if (/^(participant|actor|Note|rect\s|end\s*$|activate|deactivate|autonumber|loop\s|alt\s|else\s*$|opt\s|par\s|and\s|critical|break|group|sequenceDiagram|flowchart|stateDiagram|classDiagram|erDiagram|gantt|pie|mindmap|timeline|subgraph|style|classDef|class\s|title\s|state\s|%%|\s*\[\*\])/i.test(t)) {
+      if (/^Note\s/.test(t)) inNote = true;
+      return true;
+    }
+    // 箭头
+    if (/-->|->>|-->>|->|-[x.]>|==>|--->/.test(t)) return true;
+    // 带节点 ID 的括号（A[标签] / B(圆角) / C{菱形}）
+    if (/\w[\[\(\{][^\]]*[\]\)\}]/.test(t)) return true;
+    // class 样式应用
+    if (/^\s*class\s+[\w,]+/.test(t)) return true;
     return false;
   };
 
